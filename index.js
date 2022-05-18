@@ -6,16 +6,23 @@ import { resolve } from 'path'
 
 const logger = Logger.create(import.meta.url)
 
+/**
+ * Download 1.6.0 Darwin ARM64 Bee release
+ * and make it executable
+ */
 {
-    // download Darwin ARM64 Bee and add executable bit
     const response = await fetch('https://github.com/ethersphere/bee/releases/download/v1.6.0/bee-darwin-arm64')
     const buffer = Buffer.from(await response.arrayBuffer())
     await writeFile('bee', buffer)
     await System.execAsync('chmod +x bee')
 }
 
-// write config yaml with data dir and password
-
+/**
+ * Create `config.yaml` with a local `data-dir` and `password` `"Test"`
+ * Then run `bee init` and try to decrypt `swarm.key` afterwards
+ *
+ * It currently fails with "Key derivation failed - possibly wrong passphrase"
+ */
 {
     if (await Files.existsAsync('data-dir')) {
         await rm('data-dir', { force: true, recursive: true })
@@ -31,8 +38,12 @@ const logger = Logger.create(import.meta.url)
     }
 }
 
-// write config yaml with data dir and pass password in argv
-
+/**
+ * Do the same as before but omit `password` from `config.yaml`
+ *
+ * Password is passed via `argv` instead, and the resulting `swarm.key`
+ * can be correctly decrypted with the same password
+ */
 {
     if (await Files.existsAsync('data-dir')) {
         await rm('data-dir', { force: true, recursive: true })
